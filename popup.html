@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Auto Bidding Extension - Test Functions</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    h1 {
+      font-size: 16px;
+      color: #007bff;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .test-section {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .test-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    button {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    button:hover {
+      background-color: #0056b3;
+    }
+    
+    .warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    .warning:hover {
+      background-color: #e0a800;
+    }
+    
+    input {
+      width: 100%;
+      padding: 5px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    
+    .note {
+      font-size: 11px;
+      color: #666;
+      font-style: italic;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🤖 Auto Bidding Test Functions</h1>
+  
+  <div class="test-section">
+    <div class="test-title">Price Change Test</div>
+    <input type="text" id="testPriceInput" placeholder="Enter test price (e.g., 350.000.000 VND)">
+    <button id="testPriceInputBtn" class="warning">Test Price Change</button>
+    <div class="note">⚠️ This will modify the current lowest price display for testing</div>
+  </div>
+  
+  <div class="test-section">
+    <div class="test-title">Quick Price Tests</div>
+    <button id="testPrice350Btn">Test Price: 350M</button>
+    <button id="testPrice300Btn">Test Price: 300M</button>
+    <button id="testPrice250Btn">Test Price: 250M</button>
+  </div>
+
+  <script src="scripts/popup.js"></script>
+  
+  <div class="note" style="margin-top: 20px; text-align: center;">
+    💡 Tip: Press Ctrl+T for quick countdown test<br>
+    📝 Check browser console for detailed test results
+  </div>
+</body>
+</html>
