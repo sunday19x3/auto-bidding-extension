@@ -10,9 +10,16 @@ Tiện ích mở rộng Chrome/Edge tự động đấu giá cho hệ thống Mu
 - **Bảo vệ giá tối thiểu** - tự động dừng khi giá xuống dưới ngưỡng cho phép
 - **Xử lý popup tự động** - tự động xác nhận "Có" và đóng dialog thành công
 
+### ⏰ Điều khiển thời gian đấu thầu
+- **Đếm ngược tự động** - bắt đầu đấu giá khi còn lại thời gian chỉ định
+- **Tính thời gian chính xác** - phân tích "Thời gian còn lại" từ trang web
+- **Dừng khi hết giờ** - tự động ngừng hoạt động khi đấu thầu kết thúc
+- **Hiển thị trạng thái** - theo dõi thời gian còn lại và trạng thái chờ
+
 ### 🎛️ Bảng điều khiển trực quan
 - **Panel nổi** có thể kéo thả đến bất kỳ vị trí nào
 - **Thiết lập giá tối thiểu** để tránh đấu giá quá thấp
+- **Cấu hình thời gian** bắt đầu tự động
 - **Trạng thái real-time** hiển thị tình trạng hoạt động
 - **Giao diện tiếng Việt** hoàn chỉnh
 
@@ -20,6 +27,12 @@ Tiện ích mở rộng Chrome/Edge tự động đấu giá cho hệ thống Mu
 - **Kích hoạt thủ công** - chỉ hoạt động khi người dùng bật
 - **Dừng khẩn cấp** - có thể dừng bất cứ lúc nào
 - **Giới hạn giá** - tự động dừng khi đạt ngưỡng tối thiểu
+- **Tự động dừng** khi đấu thầu kết thúc
+
+### 🧪 Công cụ kiểm thử
+- **Test giá** - mô phỏng thay đổi giá để kiểm tra
+- **Popup giao diện** - công cụ test tiện lợi
+- **Console logging** - theo dõi hoạt động chi tiết
 
 ## 🚀 Cài đặt
 
@@ -46,15 +59,25 @@ cd auto-bidding-extension
 https://muasamcong.mpi.gov.vn/egp/bidonlinefe/reoffer-onl-proposals/...
 ```
 
-### Bước 2: Cấu hình giá tối thiểu
+### Bước 2: Cấu hình extension
 1. Panel điều khiển sẽ xuất hiện ở góc phải màn hình
-2. Nhập **giá tối thiểu** có thể chấp nhận (ví dụ: `350000000`)
-3. Kéo thả panel đến vị trí mong muốn
+2. **Cấu hình giá tối thiểu** (tùy chọn): Nhập giá thấp nhất có thể chấp nhận
+3. **Cấu hình thời gian** (tùy chọn): Nhập số giây để bắt đầu tự động (ví dụ: `50`)
+4. Kéo thả panel đến vị trí mong muốn
 
-### Bước 3: Bắt đầu đấu giá tự động
-1. Click **"Bắt Đầu Đấu Giá Tự Động"**
-2. Trạng thái chuyển thành **"Hoạt động"**
-3. Hệ thống bắt đầu giám sát và tự động đấu giá
+### Bước 3: Chọn chế độ hoạt động
+
+#### A. Bắt đầu ngay lập tức
+1. Để trống ô "Bắt đầu khi còn lại (giây)"
+2. Click **"Bắt Đầu Đấu Giá Tự Động"**
+3. Hệ thống bắt đầu giám sát và đấu giá ngay
+
+#### B. Bắt đầu theo thời gian
+1. Nhập số giây trong ô "Bắt đầu khi còn lại (giây)" (ví dụ: `50`)
+2. Click **"Bắt Đầu Đấu Giá Tự Động"**
+3. Nút chuyển thành **"Dừng Chờ Đếm Ngược"**
+4. Hệ thống chờ đến khi thời gian đếm ngược còn 50 giây
+5. Tự động bắt đầu đấu giá khi đến thời điểm
 
 ### Bước 4: Theo dõi và kiểm soát
 - **Trạng thái**: Theo dõi tình trạng hoạt động
@@ -67,7 +90,10 @@ https://muasamcong.mpi.gov.vn/egp/bidonlinefe/reoffer-onl-proposals/...
 🤖 Điều Khiển Đấu Giá Tự Động
 ┌─────────────────────────────────┐
 │ Giá tối thiểu có thể chấp nhận: │
-│ [350000000________________]     │
+│ [_________________________]    │
+│                                 │
+│ Bắt đầu khi còn lại (giây):     │
+│ [_________________________]    │
 │                                 │
 │ [Bắt Đầu Đấu Giá Tự Động]     │
 │                                 │
@@ -75,18 +101,33 @@ https://muasamcong.mpi.gov.vn/egp/bidonlinefe/reoffer-onl-proposals/...
 └─────────────────────────────────┘
 ```
 
+### Trạng thái có thể hiển thị:
+- `Không hoạt động` - Chưa bắt đầu
+- `Chờ đếm ngược: 50s (Hiện tại: 120s - Chưa đạt)` - Đang chờ thời gian
+- `Hoạt động (Tối thiểu: 350000000)` - Đang đấu giá tự động
+- `Đã dừng: Đạt giới hạn giá` - Dừng vì giá quá thấp
+- `Đấu giá đã kết thúc` - Hết thời gian đấu thầu
+
 ## 🔧 Tính năng kỹ thuật
 
 ### Giám sát thông minh
 - **MutationObserver** theo dõi thay đổi DOM
+- **Countdown Observer** giám sát thời gian đếm ngược
 - **Selector động** tìm element chính xác
-- **Text parsing** xử lý định dạng số Việt Nam
+- **Text parsing** xử lý định dạng số Việt Nam và thời gian
 
 ### Tự động hóa quy trình
 ```
+Thời gian → Kiểm tra đếm ngược → Bắt đầu khi đúng lúc
 Giá thay đổi → Tính toán giá mới → Điền form → 
 Click "Chào giá" → Xác nhận "Có" → Đóng thông báo
 ```
+
+### Xử lý thời gian thông minh
+- Phân tích "Thời gian còn lại: XX Ngày : XX Giờ : XX Phút : XX Giây"
+- Chuyển đổi thành tổng số giây
+- So sánh với thời gian cấu hình
+- Tự động dừng khi hết thời gian (00:00:00)
 
 ### Xử lý Angular Material
 - Phát hiện `mat-dialog-container`
@@ -98,24 +139,38 @@ Click "Chào giá" → Xác nhận "Có" → Đóng thông báo
 ```
 auto-bidding-extension/
 ├── manifest.json           # Cấu hình extension
+├── popup.html              # Giao diện popup test
 ├── scripts/
-│   └── content.js         # Logic chính
+│   ├── content.js         # Logic chính
+│   └── popup.js           # Test functions
 └── README.md              # Tài liệu này
 ```
 
 ## 🧪 Testing
 
-### Test thủ công thay đổi giá
+### Test qua Extension Popup
+1. Click vào icon extension trên thanh công cụ
+2. Sử dụng popup test interface:
+   - **Test Price Change**: Nhập giá tùy chọn để test
+   - **Quick Price Tests**: Test nhanh với giá 350M, 300M, 250M
+3. Kiểm tra Console để xem kết quả
+
+### Test thủ công từ Console
 ```javascript
-// Mở Console và chạy:
+// Mở Console và chạy (chỉ hoạt động nếu chưa di chuyển test functions):
 testPriceChange('350.000.000 VND')
-testMultiplePrices() // Test nhiều giá liên tiếp
 ```
 
 ### Kiểm tra hoạt động
-1. Bật auto bidding
-2. Chạy `testPriceChange('340.000.000 VND')`
+1. Cấu hình extension với giá tối thiểu
+2. Sử dụng popup để test thay đổi giá
 3. Quan sát hệ thống tự động phản ứng
+
+### Test countdown
+1. Cấu hình "Bắt đầu khi còn lại: 50"
+2. Click "Bắt Đầu Đấu Giá Tự Động"
+3. Quan sát trạng thái chờ đếm ngược
+4. Test với thời gian thực hoặc mock countdown
 
 ## ⚠️ Lưu ý quan trọng
 
