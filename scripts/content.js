@@ -477,6 +477,33 @@ function startObservers() {
 
           const priceNumber = parseInt(priceText.replace(/[^\d]/g, ''))
 
+          // Check if the new lowest price is our own bid (to prevent infinite loop)
+          const myPriceElement = Array.from(document.querySelectorAll('span')).find(
+            (span) => span.textContent && span.textContent.includes('Giá của bạn hiện tại')
+          )?.nextElementSibling
+
+          if (myPriceElement) {
+            const myPriceText = myPriceElement.textContent
+            console.log('My current price:', myPriceText)
+
+            // Check if user has placed a bid yet (handle cases like "_ VND", empty, or placeholder text)
+            const digitsOnly = myPriceText.replace(/[^\d]/g, '')
+
+            if (digitsOnly && digitsOnly.length > 0) {
+              // User has a valid bid
+              const myPriceNumber = parseInt(digitsOnly)
+
+              // If my price equals the lowest price, this means I just won the bid
+              if (!isNaN(myPriceNumber) && myPriceNumber === priceNumber) {
+                console.log('Lowest price matches my price - skipping counter bid to prevent loop')
+                return
+              }
+            } else {
+              // User hasn't placed a bid yet (showing "_ VND" or similar)
+              console.log('User has not placed any bid yet - proceeding with counter bid')
+            }
+          }
+
           // Check minimum price limit
           const minPriceInput = document.getElementById('minPriceInput')
           const minPrice = minPriceInput ? parseInt(minPriceInput.value.replace(/[^\d]/g, '')) : 0
