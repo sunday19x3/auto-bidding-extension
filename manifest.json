@@ -7,10 +7,7 @@
   "content_scripts": [
     {
       "js": ["scripts/content.js"],
-      "matches": [
-        "https://muasamcong.mpi.gov.vn/egp/bidonlinefe/reoffer-onl-proposals/*",
-        "file:///Users/sunday/Documents/Code/html.html"
-      ]
+      "matches": ["https://muasamcong.mpi.gov.vn/*", "file:///Users/sunday/Documents/Code/html.html"]
     }
   ],
   "action": {
