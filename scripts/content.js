@@ -106,6 +106,38 @@ function getCountdownSeconds() {
   return 0
 }
 
+// Function to format numbers with commas
+function formatNumberWithCommas(numberString) {
+  if (!numberString || numberString.length === 0) return ''
+  
+  // Add commas every 3 digits from the right
+  return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+// Function to adjust cursor position after formatting
+function adjustCursorPosition(oldValue, newValue, oldPosition) {
+  // Count commas before cursor in old value
+  const commasBeforeOld = (oldValue.substring(0, oldPosition).match(/,/g) || []).length
+  
+  // Count commas before cursor in new value
+  let newPosition = oldPosition
+  const digitsBeforeCursor = oldValue.substring(0, oldPosition).replace(/[^\d]/g, '').length
+  
+  // Find position in new value that corresponds to same number of digits
+  let digitCount = 0
+  for (let i = 0; i < newValue.length; i++) {
+    if (/\d/.test(newValue[i])) {
+      digitCount++
+      if (digitCount === digitsBeforeCursor) {
+        newPosition = i + 1
+        break
+      }
+    }
+  }
+  
+  return Math.min(newPosition, newValue.length)
+}
+
 // Function to create floating control panel
 function createFloatingPanel() {
   if (document.getElementById('autoBiddingPanel')) return
@@ -231,6 +263,26 @@ function createFloatingPanel() {
 
   // Add event listeners
   controlBtn.addEventListener('click', toggleCounterBidding)
+
+  // Add auto-formatting for minimum price input
+  minPriceInput.addEventListener('input', function (e) {
+    // Get cursor position before formatting
+    const cursorPosition = e.target.selectionStart
+    const oldValue = e.target.value
+
+    // Remove all non-digits
+    const numbersOnly = oldValue.replace(/[^\d]/g, '')
+
+    // Format with commas
+    const formattedValue = formatNumberWithCommas(numbersOnly)
+
+    // Update input value
+    e.target.value = formattedValue
+
+    // Restore cursor position (adjusted for new formatting)
+    const newCursorPosition = adjustCursorPosition(oldValue, formattedValue, cursorPosition)
+    e.target.setSelectionRange(newCursorPosition, newCursorPosition)
+  })
 
   // Make entire panel draggable
   let isDragging = false
