@@ -249,71 +249,32 @@ function simulatePartialTyping(inputElement, text) {
   setTimeout(() => {
     const char = lastChar
 
-    // Create and dispatch keydown event
-    const keydownEvent = new KeyboardEvent('keydown', {
-      key: char,
-      code:
-        char === '.'
-          ? 'Period'
-          : char === ','
-          ? 'Comma'
-          : /\d/.test(char)
-          ? `Digit${char}`
-          : `Key${char.toUpperCase()}`,
-      keyCode: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
-      which: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
-      bubbles: true,
-      cancelable: true,
-    })
-
-    // Create and dispatch keypress event
-    const keypressEvent = new KeyboardEvent('keypress', {
-      key: char,
-      code:
-        char === '.'
-          ? 'Period'
-          : char === ','
-          ? 'Comma'
-          : /\d/.test(char)
-          ? `Digit${char}`
-          : `Key${char.toUpperCase()}`,
-      keyCode: char.charCodeAt(0),
-      which: char.charCodeAt(0),
-      bubbles: true,
-      cancelable: true,
-    })
-
-    // Add the last character to input value
+    // Add the last character to input value first
     inputElement.value += char
 
-    // Create and dispatch input event
+    // Create and dispatch input event (most important for modern frameworks)
     const inputEvent = new Event('input', {
       bubbles: true,
       cancelable: true,
     })
 
-    // Create and dispatch keyup event
-    const keyupEvent = new KeyboardEvent('keyup', {
+    // Create optional keydown event for completeness (some sites might listen for it)
+    const keydownEvent = new KeyboardEvent('keydown', {
       key: char,
-      code:
-        char === '.'
-          ? 'Period'
-          : char === ','
-          ? 'Comma'
-          : /\d/.test(char)
-          ? `Digit${char}`
-          : `Key${char.toUpperCase()}`,
-      keyCode: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
-      which: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
+      code: /\d/.test(char)
+        ? `Digit${char}`
+        : char === '.'
+        ? 'Period'
+        : char === ','
+        ? 'Comma'
+        : `Key${char.toUpperCase()}`,
       bubbles: true,
       cancelable: true,
     })
 
-    // Dispatch all keyboard events in correct order
+    // Dispatch essential events
     inputElement.dispatchEvent(keydownEvent)
-    inputElement.dispatchEvent(keypressEvent)
     inputElement.dispatchEvent(inputEvent)
-    inputElement.dispatchEvent(keyupEvent)
 
     console.log(`Simulated typing last character: '${char}'`)
 
