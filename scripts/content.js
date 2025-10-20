@@ -59,6 +59,93 @@ function counterBidding(price) {
   }
 }
 
+// Function to perform initial price check when starting auto bidding
+function performInitialPriceCheck() {
+  console.log('Performing initial price check...')
+  
+  // Get current lowest price
+  const currentPriceElement = Array.from(document.querySelectorAll('label.fontWeight500')).find((label) =>
+    label.textContent.includes('Giá thấp nhất hiện tại')
+  )?.nextElementSibling?.nextElementSibling
+
+  if (!currentPriceElement) {
+    console.log('Could not find lowest price element for initial check')
+    return false
+  }
+
+  const priceText = currentPriceElement.textContent
+  const lowestPrice = parseInt(priceText.replace(/[^\d]/g, ''))
+  
+  if (isNaN(lowestPrice)) {
+    console.log('Could not parse lowest price for initial check')
+    return false
+  }
+
+  console.log('Initial lowest price:', lowestPrice)
+
+  // Get my current price
+  const myPriceElement = Array.from(document.querySelectorAll('span')).find(
+    (span) => span.textContent && span.textContent.includes('Giá của bạn hiện tại')
+  )?.nextElementSibling
+
+  let shouldCounterBid = false
+  
+  if (!myPriceElement) {
+    console.log('Could not find my price element - assuming no bid placed yet')
+    shouldCounterBid = true
+  } else {
+    const myPriceText = myPriceElement.textContent
+    console.log('My current price text:', myPriceText)
+
+    // Check if user has placed a bid yet (handle cases like "_ VND", empty, or placeholder text)
+    const digitsOnly = myPriceText.replace(/[^\d]/g, '')
+
+    if (!digitsOnly || digitsOnly.length === 0) {
+      // User hasn't placed a bid yet
+      console.log('No valid bid placed yet - should counter bid')
+      shouldCounterBid = true
+    } else {
+      // User has a valid bid
+      const myPrice = parseInt(digitsOnly)
+      
+      if (isNaN(myPrice)) {
+        console.log('Could not parse my price - should counter bid')
+        shouldCounterBid = true
+      } else if (myPrice > lowestPrice) {
+        console.log(`My price (${myPrice}) is higher than lowest price (${lowestPrice}) - should counter bid`)
+        shouldCounterBid = true
+      } else if (myPrice === lowestPrice) {
+        console.log(`My price (${myPrice}) equals lowest price (${lowestPrice}) - no need to counter bid`)
+        shouldCounterBid = false
+      } else {
+        console.log(`My price (${myPrice}) is lower than lowest price (${lowestPrice}) - this is unexpected but no counter bid needed`)
+        shouldCounterBid = false
+      }
+    }
+  }
+
+  // Check minimum price limit before counter bidding
+  if (shouldCounterBid) {
+    const minPriceInput = document.getElementById('minPriceInput')
+    const minPrice = minPriceInput ? parseInt(minPriceInput.value.replace(/[^\d]/g, '')) : 0
+
+    if (minPrice > 0 && lowestPrice <= minPrice) {
+      console.log(`Initial check: Lowest price ${lowestPrice} is at or below minimum limit ${minPrice} - will not counter bid`)
+      shouldCounterBid = false
+    }
+  }
+
+  // Perform counter bid if needed
+  if (shouldCounterBid) {
+    console.log('Initial price check: Counter bidding needed - performing counter bid')
+    counterBidding(lowestPrice)
+    return true
+  } else {
+    console.log('Initial price check: No counter bidding needed')
+    return false
+  }
+}
+
 // Global state for counter bidding
 let isCounterBiddingEnabled = false
 let isWaitingForCountdown = false
@@ -378,6 +465,9 @@ function startCountdownObserver(targetSeconds) {
       const minPriceText = minPriceInput?.value || 'Chưa thiết lập'
       updateStatus(`Hoạt động (Tối thiểu: ${minPriceText})`, '#28a745')
 
+      // Perform initial price check before starting observers
+      performInitialPriceCheck()
+
       startObservers()
       console.log('Đấu giá tự động đã bắt đầu!')
       return
@@ -470,6 +560,9 @@ function toggleCounterBidding() {
 
       const minPriceText = minPriceInput?.value || 'Chưa thiết lập'
       updateStatus(`Hoạt động (Tối thiểu: ${minPriceText})`, '#28a745')
+
+      // Perform initial price check before starting observers
+      performInitialPriceCheck()
 
       startObservers()
       console.log('Đấu giá tự động đã bắt đầu!')
