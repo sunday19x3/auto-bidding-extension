@@ -2,36 +2,35 @@ function counterBidding(price) {
   console.log('Counter bidding with price:', price)
 
   // Get the step price (Bước giá)
-  const stepPriceElement = Array.from(document.querySelectorAll('span')).find(span => 
-    span.textContent.includes('Bước giá :'))?.querySelector('span')
-  
+  const stepPriceElement = Array.from(document.querySelectorAll('span'))
+    .find((span) => span.textContent.includes('Bước giá :'))
+    ?.querySelector('span')
+
   if (stepPriceElement) {
     const stepPriceText = stepPriceElement.textContent
     const stepPrice = parseInt(stepPriceText.replace(/[^\d]/g, ''))
-    
+
     console.log('Step price (Bước giá):', stepPriceText, '=', stepPrice)
-    
+
     // Calculate counter price = current lowest price - step price
     const counterPrice = price - stepPrice
-    
+
     console.log('Calculated counter price:', counterPrice)
     console.log('Formula: Current price (' + price + ') - Step price (' + stepPrice + ') = ' + counterPrice)
-    
-    // Find the input element by using "Giá của bạn hiện tại" context
-    const currentPriceLabel = Array.from(document.querySelectorAll('span')).find(span => 
-      span.textContent.includes('Giá của bạn hiện tại'))
-    
-    const inputElement = currentPriceLabel?.parentNode?.parentNode?.querySelector('input')
-    
-    if (inputElement) {
-      // Format counter price with Vietnamese number format (999.999.999,0)
-      const formattedCounterPrice = formatVietnameseNumber(counterPrice)
-      inputElement.value = formattedCounterPrice
-      console.log('Filled input with formatted counter price:', formattedCounterPrice, '(raw:', counterPrice + ')')
 
-      // Trigger input events to notify Angular/React frameworks
-      inputElement.dispatchEvent(new Event('input', { bubbles: true }))
-      inputElement.dispatchEvent(new Event('change', { bubbles: true }))
+    // Find the input element by using "Giá của bạn hiện tại" context
+    const currentPriceLabel = Array.from(document.querySelectorAll('span')).find((span) =>
+      span.textContent.includes('Giá của bạn hiện tại')
+    )
+
+    const inputElement = currentPriceLabel?.parentNode?.parentNode?.querySelector('input')
+
+    if (inputElement) {
+      // Fill most of the value directly, but simulate typing the last character
+      const formattedCounterPrice = formatVietnameseNumber(counterPrice)
+      console.log('Filling input with counter price:', formattedCounterPrice, '(raw:', counterPrice + ')')
+
+      simulatePartialTyping(inputElement, counterPrice.toString())
 
       // Only auto-click if counter bidding is enabled
       if (isCounterBiddingEnabled) {
@@ -51,7 +50,7 @@ function counterBidding(price) {
     } else {
       console.log('Input element not found!')
     }
-    
+
     return counterPrice
   } else {
     console.log('Step price element not found!')
@@ -62,7 +61,7 @@ function counterBidding(price) {
 // Function to perform initial price check when starting auto bidding
 function performInitialPriceCheck() {
   console.log('Performing initial price check...')
-  
+
   // Get current lowest price
   const currentPriceElement = Array.from(document.querySelectorAll('label.fontWeight500')).find((label) =>
     label.textContent.includes('Giá thấp nhất hiện tại')
@@ -75,7 +74,7 @@ function performInitialPriceCheck() {
 
   const priceText = currentPriceElement.textContent
   const lowestPrice = parseInt(priceText.replace(/[^\d]/g, ''))
-  
+
   if (isNaN(lowestPrice)) {
     console.log('Could not parse lowest price for initial check')
     return false
@@ -89,7 +88,7 @@ function performInitialPriceCheck() {
   )?.nextElementSibling
 
   let shouldCounterBid = false
-  
+
   if (!myPriceElement) {
     console.log('Could not find my price element - assuming no bid placed yet')
     shouldCounterBid = true
@@ -107,7 +106,7 @@ function performInitialPriceCheck() {
     } else {
       // User has a valid bid
       const myPrice = parseInt(digitsOnly)
-      
+
       if (isNaN(myPrice)) {
         console.log('Could not parse my price - should counter bid')
         shouldCounterBid = true
@@ -118,7 +117,9 @@ function performInitialPriceCheck() {
         console.log(`My price (${myPrice}) equals lowest price (${lowestPrice}) - no need to counter bid`)
         shouldCounterBid = false
       } else {
-        console.log(`My price (${myPrice}) is lower than lowest price (${lowestPrice}) - this is unexpected but no counter bid needed`)
+        console.log(
+          `My price (${myPrice}) is lower than lowest price (${lowestPrice}) - this is unexpected but no counter bid needed`
+        )
         shouldCounterBid = false
       }
     }
@@ -130,7 +131,9 @@ function performInitialPriceCheck() {
     const minPrice = minPriceInput ? parseInt(minPriceInput.value.replace(/[^\d]/g, '')) : 0
 
     if (minPrice > 0 && lowestPrice <= minPrice) {
-      console.log(`Initial check: Lowest price ${lowestPrice} is at or below minimum limit ${minPrice} - will not counter bid`)
+      console.log(
+        `Initial check: Lowest price ${lowestPrice} is at or below minimum limit ${minPrice} - will not counter bid`
+      )
       shouldCounterBid = false
     }
   }
@@ -196,7 +199,7 @@ function getCountdownSeconds() {
 // Function to format numbers with commas
 function formatNumberWithCommas(numberString) {
   if (!numberString || numberString.length === 0) return ''
-  
+
   // Add commas every 3 digits from the right
   return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
@@ -204,21 +207,123 @@ function formatNumberWithCommas(numberString) {
 // Function to format numbers in Vietnamese format (999.999.999,0)
 function formatVietnameseNumber(number) {
   if (!number && number !== 0) return ''
-  
+
   // Convert to string and handle decimal part
   const numberStr = number.toString()
   const parts = numberStr.split('.')
-  
+
   // Format the integer part with dots as thousand separators
   const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-  
+
   // If there's a decimal part, add it with comma as decimal separator
   if (parts.length > 1) {
     return integerPart + ',' + parts[1]
   }
-  
+
   // For whole numbers, add ,0 at the end
   return integerPart + ',0'
+}
+
+// Function to simulate partial human typing - fill most value directly, type last character with keyboard event
+function simulatePartialTyping(inputElement, text) {
+  if (!text || text.length === 0) {
+    console.log('No text to type')
+    return
+  }
+
+  // Split text to get all characters except the last one
+  const allExceptLast = text.slice(0, -1)
+  const lastChar = text.slice(-1)
+
+  // Clear and focus input
+  inputElement.value = ''
+  inputElement.focus()
+
+  // Fill most of the value directly
+  inputElement.value = allExceptLast
+
+  // Trigger input event for the filled part
+  inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+
+  // Simulate typing the last character after a short delay
+  setTimeout(() => {
+    const char = lastChar
+
+    // Create and dispatch keydown event
+    const keydownEvent = new KeyboardEvent('keydown', {
+      key: char,
+      code:
+        char === '.'
+          ? 'Period'
+          : char === ','
+          ? 'Comma'
+          : /\d/.test(char)
+          ? `Digit${char}`
+          : `Key${char.toUpperCase()}`,
+      keyCode: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
+      which: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
+      bubbles: true,
+      cancelable: true,
+    })
+
+    // Create and dispatch keypress event
+    const keypressEvent = new KeyboardEvent('keypress', {
+      key: char,
+      code:
+        char === '.'
+          ? 'Period'
+          : char === ','
+          ? 'Comma'
+          : /\d/.test(char)
+          ? `Digit${char}`
+          : `Key${char.toUpperCase()}`,
+      keyCode: char.charCodeAt(0),
+      which: char.charCodeAt(0),
+      bubbles: true,
+      cancelable: true,
+    })
+
+    // Add the last character to input value
+    inputElement.value += char
+
+    // Create and dispatch input event
+    const inputEvent = new Event('input', {
+      bubbles: true,
+      cancelable: true,
+    })
+
+    // Create and dispatch keyup event
+    const keyupEvent = new KeyboardEvent('keyup', {
+      key: char,
+      code:
+        char === '.'
+          ? 'Period'
+          : char === ','
+          ? 'Comma'
+          : /\d/.test(char)
+          ? `Digit${char}`
+          : `Key${char.toUpperCase()}`,
+      keyCode: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
+      which: char === '.' ? 190 : char === ',' ? 188 : char.charCodeAt(0),
+      bubbles: true,
+      cancelable: true,
+    })
+
+    // Dispatch all keyboard events in correct order
+    inputElement.dispatchEvent(keydownEvent)
+    inputElement.dispatchEvent(keypressEvent)
+    inputElement.dispatchEvent(inputEvent)
+    inputElement.dispatchEvent(keyupEvent)
+
+    console.log(`Simulated typing last character: '${char}'`)
+
+    // Trigger final change event and blur after a short delay
+    setTimeout(() => {
+      inputElement.dispatchEvent(new Event('change', { bubbles: true }))
+      inputElement.blur()
+      console.log('Finished partial typing simulation')
+    }, 50)
+  }, 50) // 50ms delay before typing the last character
 }
 
 // Function to adjust cursor position after formatting
