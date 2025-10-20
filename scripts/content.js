@@ -24,19 +24,20 @@ function counterBidding(price) {
     const inputElement = currentPriceLabel?.parentNode?.parentNode?.querySelector('input')
     
     if (inputElement) {
-      // Fill plain number without formatting
-      inputElement.value = counterPrice.toString()
-      console.log('Filled input with counter price:', counterPrice)
-      
+      // Format counter price with Vietnamese number format (999.999.999,0)
+      const formattedCounterPrice = formatVietnameseNumber(counterPrice)
+      inputElement.value = formattedCounterPrice
+      console.log('Filled input with formatted counter price:', formattedCounterPrice, '(raw:', counterPrice + ')')
+
       // Trigger input events to notify Angular/React frameworks
       inputElement.dispatchEvent(new Event('input', { bubbles: true }))
       inputElement.dispatchEvent(new Event('change', { bubbles: true }))
-      
+
       // Only auto-click if counter bidding is enabled
       if (isCounterBiddingEnabled) {
         // Find and click the "chào giá" button using the same context method
         const chaoGiaButton = currentPriceLabel?.parentNode?.parentNode?.querySelector('button')
-        
+
         if (chaoGiaButton) {
           // Add a small delay to ensure input is processed
           setTimeout(() => {
@@ -47,7 +48,6 @@ function counterBidding(price) {
           console.log('Chào giá button not found!')
         }
       }
-      
     } else {
       console.log('Input element not found!')
     }
@@ -199,6 +199,26 @@ function formatNumberWithCommas(numberString) {
   
   // Add commas every 3 digits from the right
   return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+// Function to format numbers in Vietnamese format (999.999.999,0)
+function formatVietnameseNumber(number) {
+  if (!number && number !== 0) return ''
+  
+  // Convert to string and handle decimal part
+  const numberStr = number.toString()
+  const parts = numberStr.split('.')
+  
+  // Format the integer part with dots as thousand separators
+  const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  
+  // If there's a decimal part, add it with comma as decimal separator
+  if (parts.length > 1) {
+    return integerPart + ',' + parts[1]
+  }
+  
+  // For whole numbers, add ,0 at the end
+  return integerPart + ',0'
 }
 
 // Function to adjust cursor position after formatting
