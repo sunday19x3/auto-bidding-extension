@@ -150,6 +150,9 @@ auto-bidding-extension/
 
 ## 🧪 Testing
 
+### Kiểm thử khóa nhập giá
+Chạy `node --test tests/content.test.cjs` bằng Node.js 18 trở lên. Các bài kiểm thử chạy cục bộ, kiểm tra cập nhật giá chồng nhau và giữ nguyên cách nhập hai giai đoạn. Trong lúc đang nhập, các lượt nhập mới được bỏ qua; khóa được mở sau sự kiện `change` và bỏ focus.
+
 ### Test qua Extension Popup
 1. Click vào icon extension trên thanh công cụ
 2. Sử dụng popup test interface:

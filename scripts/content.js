@@ -30,7 +30,7 @@ function counterBidding(price) {
       const formattedCounterPrice = formatVietnameseNumber(counterPrice)
       console.log('Filling input with counter price:', formattedCounterPrice, '(raw:', counterPrice + ')')
 
-      simulatePartialTyping(inputElement, counterPrice.toString())
+      if (!simulatePartialTyping(inputElement, counterPrice.toString())) return null
 
       // Only auto-click if counter bidding is enabled
       if (isCounterBiddingEnabled) {
@@ -156,6 +156,7 @@ let priceObserver = null
 let popupObserver = null
 let successObserver = null
 let countdownObserver = null
+let isTypingPrice = false
 
 // Function to get countdown in seconds
 function getCountdownSeconds() {
@@ -226,10 +227,15 @@ function formatVietnameseNumber(number) {
 
 // Function to simulate partial human typing - fill most value directly, type last character with keyboard event
 function simulatePartialTyping(inputElement, text) {
+  // Ignore overlapping attempts until both typing phases finish.
+  if (isTypingPrice) return false
+
   if (!text || text.length === 0) {
     console.log('No text to type')
-    return
+    return false
   }
+
+  isTypingPrice = true
 
   // Split text to get all characters except the last one
   const allExceptLast = text.slice(0, -1)
@@ -283,8 +289,11 @@ function simulatePartialTyping(inputElement, text) {
       inputElement.dispatchEvent(new Event('change', { bubbles: true }))
       inputElement.blur()
       console.log('Finished partial typing simulation')
+      isTypingPrice = false
     }, 50)
   }, 50) // 50ms delay before typing the last character
+
+  return true
 }
 
 // Function to adjust cursor position after formatting
