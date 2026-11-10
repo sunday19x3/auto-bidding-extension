@@ -49,7 +49,7 @@ cd auto-bidding-extension
 4. Chọn thư mục `auto-bidding-extension`
 
 ### 3. Cấp quyền truy cập
-- Tiện ích sẽ tự động hoạt động trên `muasamcong.mpi.gov.vn`
+- Tiện ích tự động hoạt động trên mọi tên miền dùng HTTP/HTTPS có đường dẫn bắt đầu bằng `/egp/bidonlinefe/reoffer-onl-proposals/`
 - Không cần cấu hình thêm gì
 
 ## 📖 Cách sử dụng
@@ -58,6 +58,8 @@ cd auto-bidding-extension
 ```
 https://muasamcong.mpi.gov.vn/egp/bidonlinefe/reoffer-onl-proposals/...
 ```
+
+Tên miền có thể thay đổi; tiện ích chỉ kiểm tra đường dẫn `/egp/bidonlinefe/reoffer-onl-proposals/*` trên các trang HTTP/HTTPS.
 
 ### Bước 2: Cấu hình extension
 1. Panel điều khiển sẽ xuất hiện ở góc phải màn hình
@@ -186,7 +188,7 @@ testPriceChange('350.000.000 VND')
 
 ### Bảo mật
 - Không lưu trữ thông tin cá nhân
-- Chỉ hoạt động trên domain được phép
+- Chỉ tự động tải bảng điều khiển trên các trang HTTP/HTTPS có đường dẫn `/egp/bidonlinefe/reoffer-onl-proposals/*`
 - Mã nguồn mở, có thể kiểm tra
 
 ## 🤝 Đóng góp
